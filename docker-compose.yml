@@ -9,4 +9,4 @@ services:
     volumes:
       - ./server:/opt/app/api
     env_file:
-      - .env
+      - server/.env

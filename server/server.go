@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"net/http"
+	"os"
 	"os/exec"
 	"time"
 
@@ -22,7 +24,9 @@ type PullRequest struct {
 // getPullRequests fetches open pull requests and their statuses
 func getPullRequests() ([]PullRequest, error) {
 	// Command to get open pull requests using GitHub CLI
-	cmd := exec.Command("gh", "pr", "list", "--repo", "grimaldev/immozia", "--json", "number,title,createdAt,state")
+	// Get the repository name from the .env file
+	repo := os.Getenv("REPO")
+	cmd := exec.Command("gh", "pr", "list", "--repo", repo, "--json", "number,title,createdAt,state")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return nil, err
@@ -40,7 +44,6 @@ func getPullRequests() ([]PullRequest, error) {
 
 // formatPullRequestToHTML formats a pull request to the required HTML
 func formatPullRequestToHTML(pr PullRequest) string {
-	//parse created at date in YYYY-MM-DD HH:MM:SS format
 	date := pr.CreatedAt[:10] + " " + pr.CreatedAt[11:19]
 	return fmt.Sprintf("<li><div class=\"col col-1\">%d</div><div class=\"col col-2\">%s</div><div class=\"col col-3\">%s</div><div class=\"col col-4\">%s</div></li>", pr.Number, pr.Title, pr.Status, date)
 }
@@ -90,6 +93,11 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	err := godotenv.Load(".env")
+	if err != nil {
+		e.Logger.Fatal("Error loading .env file")
+	}
+
 	// Enable CORS for all origins
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"*"},
@@ -97,12 +105,10 @@ func main() {
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
-	// Public static route
 	e.Static("/public", "public")
 
 	// SSE endpoint
 	e.GET("/sse", handleSSE)
 
-	// Start server
 	e.Logger.Fatal(e.Start(":3434"))
 }
