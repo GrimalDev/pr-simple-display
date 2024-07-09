@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>prs</title>
+    <link
+      href="http://grimaldev.local:3434/public/stylesheets/style.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx-ext-sse@2.1.0/sse.js"></script>
+  </head>
+  <body>
+    <div class="prs__container">
+      <div class="prs">
+        <div class="prs__header">
+          <div class="col col-1">Number</div>
+          <div class="col col-2">TITLE</div>
+          <div class="col col-3">STATUS</div>
+          <div class="col col-4">DATE</div>
+        </div>
+        <ul
+          class="prs__data"
+          hx-ext="sse"
+          sse-connect="http://grimaldev.local:3434/sse"
+          sse-swap="pr"
+        ></ul>
+      </div>
+    </div>
+  </body>
+</html>

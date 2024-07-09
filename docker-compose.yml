@@ -1,0 +1,12 @@
+services:
+  backend:
+    container_name: pr-simple-api
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+    ports:
+      - "3434:3434"
+    volumes:
+      - ./server:/opt/app/api
+    env_file:
+      - .env
